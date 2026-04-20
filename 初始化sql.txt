@@ -1,0 +1,90 @@
+-- 创建数据库
+CREATE DATABASE IF NOT EXISTS `street_taco` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `street_taco`;
+
+-- 1. 用户表 (微信用户体系)
+CREATE TABLE `sys_user` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `open_id` varchar(64) NOT NULL COMMENT '微信OpenID (唯一标识)',
+  `nickname` varchar(64) DEFAULT NULL COMMENT '默认昵称',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_open_id` (`open_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='微信用户表';
+
+-- 2. 菜品分类表
+CREATE TABLE `category` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(32) NOT NULL COMMENT '分类名称 (如：招牌塔可、小吃、饮品)',
+  `sort_order` int NOT NULL DEFAULT '0' COMMENT '排序权重 (数字越小越靠前)',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除 (0:未删除, 1:已删除)',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='菜品分类表';
+
+-- 3. 菜品库表
+CREATE TABLE `product` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `category_id` bigint NOT NULL COMMENT '所属分类ID',
+  `name` varchar(64) NOT NULL COMMENT '菜品名称',
+  `image_url` varchar(255) DEFAULT NULL COMMENT '菜品图片(OSS外链)',
+  `price` decimal(10,2) NOT NULL COMMENT '价格',
+  `description` varchar(255) DEFAULT NULL COMMENT '菜品描述简介',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 (0:下架/售罄, 1:上架)',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除 (0:未删除, 1:已删除)',
+  PRIMARY KEY (`id`),
+  KEY `idx_category_id` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='菜品主表';
+
+-- 4. 订单主表
+CREATE TABLE `order_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `order_no` varchar(32) NOT NULL COMMENT '业务流水号 (基于日期时间生成的独立ID)',
+  `user_id` bigint DEFAULT NULL COMMENT '下单用户ID (代客下单时可为空)',
+  `table_no` varchar(16) NOT NULL COMMENT '桌号或取餐号',
+  `total_amount` decimal(10,2) NOT NULL COMMENT '订单总金额',
+  `remark` varchar(255) DEFAULT NULL COMMENT '订单备注/忌口',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 (1:待处理, 2:制作中, 3:已完成, 4:已取消)',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除 (0:未删除, 1:已删除)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_no` (`order_no`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_create_time` (`create_time`) COMMENT '用于B端数据看板的年月周日统计查询'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单主表';
+
+-- 5. 订单明细表
+CREATE TABLE `order_item` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `order_id` bigint NOT NULL COMMENT '归属的订单主表ID',
+  `product_id` bigint NOT NULL COMMENT '菜品ID',
+  `product_name` varchar(64) NOT NULL COMMENT '下单时的菜品名称(防止后期菜品改名导致历史订单变化)',
+  `price` decimal(10,2) NOT NULL COMMENT '下单时的单价',
+  `quantity` int NOT NULL COMMENT '购买数量',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_order_id` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='订单明细表';
+
+-- 6. 商家后台管理员表
+CREATE TABLE `sys_admin` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `username` varchar(32) NOT NULL COMMENT '登录用户名',
+  `password` varchar(128) NOT NULL COMMENT '加密后的密码',
+  `real_name` varchar(32) DEFAULT NULL COMMENT '真实姓名',
+  `avatar` varchar(255) DEFAULT NULL COMMENT '头像',
+  `role` varchar(20) NOT NULL DEFAULT 'STAFF' COMMENT '角色 (ADMIN:超级管理员, STAFF:普通员工)',
+  `status` tinyint NOT NULL DEFAULT '1' COMMENT '状态 (0:禁用, 1:启用)',
+  `last_login_time` datetime DEFAULT NULL COMMENT '最后登录时间',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='后台管理员表';
