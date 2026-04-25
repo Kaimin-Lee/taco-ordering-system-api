@@ -2,6 +2,7 @@ package org.example.tacoorderingsystemapi.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.tacoorderingsystemapi.mapper.OrderInfoMapper;
+import org.example.tacoorderingsystemapi.entity.OrderInfo;
 import org.example.tacoorderingsystemapi.vo.DashboardVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,10 @@ public class B_DashboardService {
     }
 
     private DashboardVO getStatsByCondition(String condition) {
-        QueryWrapper<Map<String, Object>> wrapper = new QueryWrapper<>();
+        QueryWrapper<OrderInfo> wrapper = new QueryWrapper<>();
         wrapper.select("COUNT(*) as totalOrders",
-                      "SUM(total_amount) as totalAmount")
-               .apply(condition);
+                        "SUM(total_amount) as totalAmount")
+                .apply(condition);
 
         Map<String, Object> result = orderInfoMapper.selectMaps(wrapper).get(0);
 
