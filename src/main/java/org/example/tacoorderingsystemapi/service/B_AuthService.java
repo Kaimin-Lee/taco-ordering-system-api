@@ -35,6 +35,6 @@ public class B_AuthService {
             throw new RuntimeException("账号已被禁用");
         }
 
-        return jwtUtil.createToken(admin.getId());
+        return jwtUtil.createAdminToken(admin.getId());
     }
 }

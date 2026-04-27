@@ -86,7 +86,7 @@ public class C_OrderService {
         orderInfo.setTableNo(dto.getTableNo());
         orderInfo.setTotalAmount(totalAmount);
         orderInfo.setRemark(dto.getRemark());
-        orderInfo.setStatus(1); // 1: 待处理
+        orderInfo.setStatus(0); // 0: 待处理
 
         orderInfoMapper.insert(orderInfo); // 插入后，MyBatis-Plus 会自动将生成的 ID 回填到 orderInfo 中
 

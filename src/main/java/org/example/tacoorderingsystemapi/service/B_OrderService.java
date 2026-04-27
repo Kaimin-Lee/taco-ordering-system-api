@@ -44,10 +44,10 @@ public class B_OrderService {
         Page<OrderInfo> pageObj = new Page<>(page, size);
         LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
         if (orderNo != null && !orderNo.isEmpty()) {
-            wrapper.eq(OrderInfo::getOrderNo, orderNo);
+            wrapper.like(OrderInfo::getOrderNo, orderNo);
         }
         if (tableNo != null && !tableNo.isEmpty()) {
-            wrapper.eq(OrderInfo::getTableNo, tableNo);
+            wrapper.like(OrderInfo::getTableNo, tableNo);
         }
         wrapper.orderByDesc(OrderInfo::getCreateTime);
         return orderInfoMapper.selectPage(pageObj, wrapper);

@@ -11,32 +11,41 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    // 实际生产环境应从 yml 配置中读取
     private static final String SECRET = "street-taco-ordering-system-very-secure-key-2026";
-    private static final long EXPIRATION = 604800000L; // 7天
+    private static final long EXPIRATION = 604800000L;
     private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    /**
-     * 根据用户ID生成Token
-     */
     public String createToken(Long userId) {
+        return buildToken(userId, "user");
+    }
+
+    public String createAdminToken(Long adminId) {
+        return buildToken(adminId, "admin");
+    }
+
+    private String buildToken(Long id, String role) {
         return Jwts.builder()
-                .setSubject("USER_AUTH")
-                .claim("userId", userId)
+                .setSubject("AUTH")
+                .claim("userId", id)
+                .claim("role", role)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /**
-     * 从Token中解析出用户ID
-     */
     public Long getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
+        return getClaims(token).get("userId", Long.class);
+    }
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get("userId", Long.class);
     }
 }
