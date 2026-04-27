@@ -35,8 +35,8 @@ public class B_DashboardService {
     private DashboardVO getStatsByCondition(String condition) {
         QueryWrapper<OrderInfo> wrapper = new QueryWrapper<>();
         wrapper.select("COUNT(*) as totalOrders",
-                      "SUM(total_amount) as totalAmount")
-               .apply(condition);
+                        "SUM(total_amount) as totalAmount")
+                .apply(condition);
 
         Map<String, Object> result = orderInfoMapper.selectMaps(wrapper).get(0);
 
