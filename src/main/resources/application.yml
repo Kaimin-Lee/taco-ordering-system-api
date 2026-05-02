@@ -1,32 +1,14 @@
-server:
-  port: 8080
-
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.102.105.7:3306/street_taco?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: street_taco
-    password: cHTiLFLPesfmy8Y3
-
+  profiles:
+    active: local、、、、
 mybatis-plus:
   global-config:
     db-config:
-      # ???????????????? is_deleted=1 ???
       logic-delete-field: isDeleted
       logic-delete-value: 1
       logic-not-delete-value: 0
   configuration:
-    # ??????????? Java ?????????
     map-underscore-to-camel-case: true
-    # ????? SQL ????? MVP ????
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-wechat:
-  miniapp:
-    appid: wx_your_app_id_here
-    secret: your_app_secret_here
-
-# JWT ???? (??????? Token)
 jwt:
-  secret: street_taco_super_secret_key_change_it_in_prod
-  expiration: 604800 # 7?????????
+  expiration: 604800 # 7天

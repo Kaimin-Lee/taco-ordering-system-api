@@ -22,9 +22,14 @@ public class SysUser {
     private String openId;
 
     /**
-     * 默认昵称
+     * 用户昵称
      */
     private String nickname;
+
+    /**
+     * 手机号
+     */
+    private String phone;
 
     /**
      * 创建时间
