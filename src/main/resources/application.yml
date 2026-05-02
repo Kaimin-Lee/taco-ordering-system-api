@@ -4,13 +4,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/street_taco?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+    url: jdbc:mysql://47.102.105.7:3306/street_taco?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: street_taco
+    password: cHTiLFLPesfmy8Y3
 
 mybatis-plus:
   global-config:
@@ -34,7 +30,3 @@ wechat:
 jwt:
   secret: street_taco_super_secret_key_change_it_in_prod
   expiration: 604800 # 7?????????
-
-upload:
-  path: uploads/
-  base-url: http://localhost:8080/uploads/
