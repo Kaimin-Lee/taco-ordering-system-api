@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local、、、、
+    active: test
 mybatis-plus:
   global-config:
     db-config:

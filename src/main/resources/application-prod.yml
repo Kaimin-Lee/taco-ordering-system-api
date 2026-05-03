@@ -10,8 +10,8 @@ spring:
 
 wechat:
   miniapp:
-    appid: wx_your_app_id_here
-    secret: your_app_secret_here
+    appid: wx0285acfa4cccda04
+    secret: e82e523ac33d1c9e3d1fb95b339887eb
 
 jwt:
   secret: street_taco_super_secret_key_change_it_in_prod

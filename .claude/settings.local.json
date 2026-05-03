@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mvn spring-boot:run)",
       "WebSearch",
-      "Bash(mvn *)"
+      "Bash(mvn *)",
+      "Bash(./mvnw clean *)"
     ]
   }
 }
