@@ -6,6 +6,7 @@ import org.example.tacoorderingsystemapi.entity.OrderItem;
 import org.example.tacoorderingsystemapi.mapper.OrderInfoMapper;
 import org.example.tacoorderingsystemapi.mapper.OrderItemMapper;
 import org.example.tacoorderingsystemapi.vo.DashboardVO;
+import org.example.tacoorderingsystemapi.vo.RecentOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +24,44 @@ public class B_DashboardService {
     private OrderItemMapper orderItemMapper;
 
     public DashboardVO getToday() {
-        return getStatsByCondition("DATE(create_time) = CURDATE()");
+        DashboardVO vo = getStatsByCondition("DATE(create_time) = CURDATE()");
+        vo.setRecentOrders(getRecentOrders());
+        return vo;
     }
 
     public DashboardVO getThisWeek() {
-        return getStatsByCondition("YEARWEEK(create_time) = YEARWEEK(NOW())");
+        DashboardVO vo = getStatsByCondition("YEARWEEK(create_time, 1) = YEARWEEK(NOW(), 1)");
+        vo.setRecentOrders(getRecentOrders());
+        return vo;
     }
 
     public DashboardVO getThisMonth() {
-        return getStatsByCondition("DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')");
+        DashboardVO vo = getStatsByCondition("DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(NOW(), '%Y-%m')");
+        vo.setRecentOrders(getRecentOrders());
+        return vo;
     }
 
     public DashboardVO getThisYear() {
-        return getStatsByCondition("YEAR(create_time) = YEAR(NOW())");
+        DashboardVO vo = getStatsByCondition("YEAR(create_time) = YEAR(NOW())");
+        vo.setRecentOrders(getRecentOrders());
+        return vo;
+    }
+
+    private List<RecentOrderVO> getRecentOrders() {
+        QueryWrapper<OrderInfo> wrapper = new QueryWrapper<>();
+        wrapper.select("id", "order_no", "total_amount", "status", "create_time")
+                .orderByDesc("create_time")
+                .last("LIMIT 5");
+        List<OrderInfo> orders = orderInfoMapper.selectList(wrapper);
+        return orders.stream().map(o -> {
+            RecentOrderVO vo = new RecentOrderVO();
+            vo.setId(o.getId());
+            vo.setOrderNo(o.getOrderNo());
+            vo.setTotalAmount(o.getTotalAmount().toString());
+            vo.setStatus(o.getStatus());
+            vo.setCreateTime(o.getCreateTime());
+            return vo;
+        }).collect(Collectors.toList());
     }
 
     private DashboardVO getStatsByCondition(String condition) {

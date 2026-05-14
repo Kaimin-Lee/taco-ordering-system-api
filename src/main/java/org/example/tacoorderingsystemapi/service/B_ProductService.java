@@ -24,6 +24,12 @@ public class B_ProductService {
     }
 
     public void add(ProductDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new RuntimeException("商品名称不能为空");
+        }
+        if (dto.getPrice() == null || dto.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("商品价格必须大于0");
+        }
         Product product = new Product();
         product.setCategoryId(dto.getCategoryId());
         product.setName(dto.getName());
@@ -35,6 +41,12 @@ public class B_ProductService {
     }
 
     public void update(Long id, ProductDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new RuntimeException("商品名称不能为空");
+        }
+        if (dto.getPrice() == null || dto.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("商品价格必须大于0");
+        }
         Product product = productMapper.selectById(id);
         if (product == null) {
             throw new RuntimeException("商品不存在");

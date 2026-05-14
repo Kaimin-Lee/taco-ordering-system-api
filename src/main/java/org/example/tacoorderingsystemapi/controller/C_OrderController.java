@@ -30,4 +30,9 @@ public class C_OrderController {
     public Result<List<OrderDetailVO>> getMyOrders() {
         return Result.success(userOrderService.getMyOrders());
     }
+
+    @GetMapping("/detail/{orderNo}")
+    public Result<OrderDetailVO> getOrderDetail(@PathVariable String orderNo) {
+        return Result.success(userOrderService.getOrderDetail(orderNo));
+    }
 }

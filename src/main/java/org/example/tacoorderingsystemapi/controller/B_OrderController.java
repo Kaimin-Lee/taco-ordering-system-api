@@ -1,6 +1,7 @@
 package org.example.tacoorderingsystemapi.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.example.tacoorderingsystemapi.dto.ManualOrderDTO;
 import org.example.tacoorderingsystemapi.entity.OrderInfo;
 import org.example.tacoorderingsystemapi.service.B_OrderService;
 import org.example.tacoorderingsystemapi.vo.OrderDetailVO;
@@ -22,6 +23,11 @@ public class B_OrderController {
         return Result.success(orderService.getTodayOrders());
     }
 
+    @GetMapping("/period/{period}")
+    public Result<List<OrderInfo>> getOrdersByPeriod(@PathVariable String period) {
+        return Result.success(orderService.getOrdersByPeriod(period));
+    }
+
     @PutMapping("/status/{id}")
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         orderService.updateStatus(id, status);
@@ -32,13 +38,17 @@ public class B_OrderController {
     public Result<Page<OrderInfo>> search(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String orderNo,
-            @RequestParam(required = false) String tableNo) {
-        return Result.success(orderService.search(page, size, orderNo, tableNo));
+            @RequestParam(required = false) String orderNo) {
+        return Result.success(orderService.search(page, size, orderNo));
     }
 
     @GetMapping("/detail/{id}")
     public Result<OrderDetailVO> getDetail(@PathVariable Long id) {
         return Result.success(orderService.getDetail(id));
+    }
+
+    @PostMapping("/create")
+    public Result<String> createManualOrder(@RequestBody ManualOrderDTO dto) {
+        return Result.success(orderService.createManualOrder(dto));
     }
 }

@@ -32,6 +32,11 @@ public class SysUser {
     private String phone;
 
     /**
+     * 微信session_key（用于解密手机号）
+     */
+    private String sessionKey;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

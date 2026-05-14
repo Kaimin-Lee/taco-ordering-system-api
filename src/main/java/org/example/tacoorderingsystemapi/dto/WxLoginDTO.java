@@ -5,4 +5,8 @@ import lombok.Data;
 @Data
 public class WxLoginDTO {
     private String code;
+    private String nickname;
+    private String phone;
+    private String encryptedData;
+    private String iv;
 }

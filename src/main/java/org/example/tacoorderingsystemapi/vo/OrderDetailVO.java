@@ -9,7 +9,6 @@ import java.util.List;
 public class OrderDetailVO {
     private Long id;
     private String orderNo;
-    private String tableNo;
     private BigDecimal totalAmount;
     private String remark;
     private Integer status;

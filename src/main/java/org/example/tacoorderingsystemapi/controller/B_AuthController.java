@@ -18,4 +18,9 @@ public class B_AuthController {
         String token = authService.login(dto.getUsername(), dto.getPassword());
         return Result.success(token);
     }
+
+    @PostMapping("/logout")
+    public Result<Void> logout() {
+        return Result.success();
+    }
 }

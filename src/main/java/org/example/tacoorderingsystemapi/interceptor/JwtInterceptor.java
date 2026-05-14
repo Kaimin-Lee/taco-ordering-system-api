@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.tacoorderingsystemapi.util.JwtUtil;
 import org.example.tacoorderingsystemapi.util.UserContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -11,29 +13,36 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
+
     @Autowired
     private JwtUtil jwtUtil;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 1. 从 HTTP Header 中获取 Token (规范格式: Authorization: Bearer <token>)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String authHeader = request.getHeader("Authorization");
+        log.info("请求路径: {}, Authorization Header: {}", request.getRequestURI(), authHeader);
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // 截取掉 "Bearer "
+            String token = authHeader.substring(7);
+            log.info("提取到token, 长度: {}", token.length());
             try {
-                // 2. 解析 Token 获取用户 ID
                 Long userId = jwtUtil.getUserId(token);
-                // 3. 存入 ThreadLocal
+                log.info("token验证成功, userId: {}", userId);
                 UserContext.setUserId(userId);
-                return true; // 放行
+                return true;
             } catch (Exception e) {
-                // Token 过期或伪造
+                log.error("token验证失败: {}", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }
         }
 
-        // 没带 Token，直接拒绝
+        log.warn("未找到Authorization header或格式不正确");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
     }

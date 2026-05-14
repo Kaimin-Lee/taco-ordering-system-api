@@ -4,9 +4,9 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OrderSubmitDTO {
-    private String remark;
+public class ManualOrderDTO {
     private List<OrderItemDTO> items;
+    private String remark;
 
     @Data
     public static class OrderItemDTO {

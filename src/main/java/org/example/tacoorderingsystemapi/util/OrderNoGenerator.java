@@ -1,32 +1,60 @@
 package org.example.tacoorderingsystemapi.util;
 
-import java.time.LocalDateTime;
+import org.example.tacoorderingsystemapi.mapper.OrderInfoMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * 订单流水号生成工具
- */
+@Component
 public class OrderNoGenerator {
 
-    // 定义时间格式化器
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final ThreadLocalRandom RANDOM = ThreadLocalRandom.current();
 
-    /**
-     * 全新的订单号生成方法，作为一个独立的替代方案
-     * 格式：时间戳(14位) + 随机数(4位) = 18位订单号
-     * 示例：202604181745308821
-     *
-     * @return 18位唯一业务流水号
-     */
-    public static String generateNewTradeNo() {
-        // 1. 获取当前时间的格式化字符串
-        String timeStr = LocalDateTime.now().format(TIME_FORMATTER);
+    @Autowired
+    private OrderInfoMapper orderInfoMapper;
 
-        // 2. 生成 1000 到 9999 之间的随机数 (ThreadLocalRandom 在多线程下性能更好且安全)
-        int randomNum = ThreadLocalRandom.current().nextInt(1000, 10000);
-
-        // 3. 拼接并返回
-        return timeStr + randomNum;
+    public String generate() {
+        String dateStr = LocalDate.now().format(DATE_FORMATTER);
+        
+        List<String> todayOrderNos = orderInfoMapper.listTodayOrderNos();
+        
+        String random2 = String.format("%02d", RANDOM.nextInt(100));
+        int seq = 1;
+        
+        if (!todayOrderNos.isEmpty()) {
+            String lastOrderNo = todayOrderNos.get(todayOrderNos.size() - 1);
+            String lastRandom2 = lastOrderNo.substring(8, 10);
+            int lastSeq = Integer.parseInt(lastOrderNo.substring(10));
+            
+            if (lastSeq < 999) {
+                random2 = lastRandom2;
+                seq = lastSeq + 1;
+            } else {
+                random2 = getNewRandom2(todayOrderNos, lastRandom2);
+                seq = 1;
+            }
+        }
+        
+        return dateStr + random2 + String.format("%03d", seq);
+    }
+    
+    private String getNewRandom2(List<String> todayOrderNos, String exclude) {
+        for (int i = 0; i < 100; i++) {
+            String r = String.format("%02d", RANDOM.nextInt(100));
+            if (!r.equals(exclude) && !isRandom2Used(todayOrderNos, r)) {
+                return r;
+            }
+        }
+        return String.format("%02d", RANDOM.nextInt(100));
+    }
+    
+    private boolean isRandom2Used(List<String> todayOrderNos, String random2) {
+        String prefix = LocalDate.now().format(DATE_FORMATTER) + random2;
+        return todayOrderNos.stream().anyMatch(n -> n.startsWith(prefix));
     }
 }

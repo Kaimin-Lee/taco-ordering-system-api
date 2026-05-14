@@ -23,6 +23,9 @@ public class B_CategoryService {
     }
 
     public void add(CategoryDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new RuntimeException("分类名称不能为空");
+        }
         Category category = new Category();
         category.setName(dto.getName());
         category.setSortOrder(dto.getSortOrder());
@@ -30,6 +33,9 @@ public class B_CategoryService {
     }
 
     public void update(Long id, CategoryDTO dto) {
+        if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+            throw new RuntimeException("分类名称不能为空");
+        }
         Category category = categoryMapper.selectById(id);
         if (category == null) {
             throw new RuntimeException("分类不存在");
